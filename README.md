@@ -341,12 +341,6 @@ Please ensure your contributions include clear comments and follow existing code
  
 ---
  
-## License
- 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
- 
----
- 
 ## Author
  
 **Labhansh Goyal**

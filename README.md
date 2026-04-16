@@ -15,7 +15,6 @@
 - [Business Applications](#business-applications)
 - [Future Work](#future-work)
 - [Contributing](#contributing)
-- [License](#license)
 ---
  
 ## Overview

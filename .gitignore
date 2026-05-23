@@ -1,0 +1,18 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Model files (too large for GitHub)
+models/
+plots/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment files
+.env
+venv/
+
+# Excel temp files
+~$*.xlsx

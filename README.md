@@ -1,6 +1,13 @@
+## Overview
+ 
+This project implements an end-to-end **supervised binary classification** pipeline to determine whether a loan application should be **approved** or **rejected**. It covers the full data science lifecycle — from raw data ingestion and exploratory analysis, through preprocessing and feature engineering, to training multiple ML models and comparing their performance.
+ 
+The goal is to help financial institutions automate and improve their loan screening process using data-driven insights.
+ 
+---
+
 ## 📑 Table of Contents
  
-- [Overview](#overview)
 - [Problem Statement](#problem-statement)
 - [Project Structure](#project-structure)
 - [Dataset](#dataset)
@@ -15,14 +22,6 @@
 - [Business Applications](#business-applications)
 - [Future Work](#future-work)
 - [Contributing](#contributing)
----
- 
-## Overview
- 
-This project implements an end-to-end **supervised binary classification** pipeline to determine whether a loan application should be **approved** or **rejected**. It covers the full data science lifecycle — from raw data ingestion and exploratory analysis, through preprocessing and feature engineering, to training multiple ML models and comparing their performance.
- 
-The goal is to help financial institutions automate and improve their loan screening process using data-driven insights.
- 
 ---
  
 ## Problem Statement

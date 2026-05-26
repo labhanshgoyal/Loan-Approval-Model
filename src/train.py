@@ -66,4 +66,24 @@ def plot_confusion_matrices(results, y_test):
     plt.tight_layout()
     plt.savefig(f"{PLOTS_DIR}/confusion_matrices.png", dpi=150, bbox_inches='tight')
     plt.close()
-    print("Saved: confusion_matrices.png")     
+    print("Saved: confusion_matrices.png")
+
+def plot_roc_curves(results, y_test):
+    plt.figure(figsize=(8, 6))
+    colors = ['#3498db', '#e74c3c', '#2ecc71']
+    for (name, data), color in zip(results.items(), colors):
+        RocCurveDisplay.from_predictions(
+            y_test, data["y_proba"],
+            name=f"{name} (AUC={data['metrics']['ROC-AUC']:.3f})",
+            ax=plt.gca(), color=color, lw=2
+        )
+    plt.plot([0, 1], [0, 1], 'k--', lw=1, label='Random (AUC=0.5)')
+    plt.title("ROC Curves", fontsize=14, fontweight='bold')
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.legend(loc='lower right')
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(f"{PLOTS_DIR}/roc_curves.png", dpi=150, bbox_inches='tight')
+    plt.close()
+    print("Saved: roc_curves.png")

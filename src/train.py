@@ -51,5 +51,19 @@ def train_and_evaluate(X_train, X_test, y_train, y_test):
                 "ROC-AUC": roc_auc_score(y_test, y_proba),
             }
         }
-        print(f"{name}: Accuracy={results[name]['metrics']['Accuracy']:.3f}, F1={results[name]['metrics'] ['F1-Score']:.3f}, AUC={results[name]['metrics'] ['ROC-AUC']:.3f}")
+        print(f"{name}: Accuracy={results[name]['metrics']['Accuracy']:.3f}, F1={results[name]['metrics']['F1-Score']:.3f}, AUC={results[name]['metrics']['ROC-AUC']:.3f}")
     return results
+
+def plot_confusion_matrices(results, y_test):
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    fig.suptitle("Confusion Matrices", fontsize = 16, fontweight="bold")
+    for ax, (name, data) in zip(axes, results.items()):
+        cm = confusion_matrix(y_test, data["y_pred"])
+        sns.heatmap(cm, annot=True, fmt='d', ax = ax, cmap='Blues', xticklabels=['Rejected', 'Approved'], yticklabels=['Rejected', 'Approved'])
+        ax.set_title(f"{name}\nAccuracy: {data['metrics']['Accuracy']:.2%}")
+        ax.set_xlabel("Predicted")
+        ax.set_ylabel("Actual")
+    plt.tight_layout()
+    plt.savefig(f"{PLOTS_DIR}/confusion_matrices.png", dpi=150, bbox_inches='tight')
+    plt.close()
+    print("Saved: confusion_matrices.png")     

@@ -87,3 +87,19 @@ def plot_roc_curves(results, y_test):
     plt.savefig(f"{PLOTS_DIR}/roc_curves.png", dpi=150, bbox_inches='tight')
     plt.close()
     print("Saved: roc_curves.png")
+
+def plot_feature_importance(results, feature_names):
+    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+    fig.suptitle("Feature Importance", fontsize=16, fontweight='bold')
+    for ax, model_name in zip(axes, ["Random Forest", "XGBoost"]):
+        model = results[model_name]["model"]
+        importances = model.feature_importances_
+        feat = pd.Series(importances, index=feature_names).sort_values(ascending=True)
+        feat.plot(kind='barh', ax=ax, color='steelblue')
+        ax.set_title(f"{model_name}", fontweight='bold')
+        ax.set_xlabel("Importance Score")
+        ax.grid(axis='x', alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(f"{PLOTS_DIR}/feature_importance.png", dpi=150, bbox_inches='tight')
+    plt.close()
+    print("Saved: feature_importance.png")

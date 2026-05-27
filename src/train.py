@@ -103,3 +103,16 @@ def plot_feature_importance(results, feature_names):
     plt.savefig(f"{PLOTS_DIR}/feature_importance.png", dpi=150, bbox_inches='tight')
     plt.close()
     print("Saved: feature_importance.png")
+
+def select_and_save_best_model(results, imputer,scaler, feature_names):
+    best_name = max(results, key=lambda k: results[k]['metrics']['F1-Score'])
+    best_model = results[best_name]["model"]
+    print(f"\nBest Model: {best_name} (F1={results[best_name]['metrics']['F1-Score']:.4f})")
+    joblib.dump(best_model, f"{MODELS_DIR}/best_model.pkl") #saved the model to pickle format file (makes the decision)
+    joblib.dump(imputer, f"{MODELS_DIR}/imputer.pkl") #saves the imputer (the median values learned from training data) (fills any missing fields)
+    joblib.dump(scaler, f"{MODELS_DIR}/scaler.pkl") #saves the scaler (the mean/std learned from training data) (normalizes the numbers)
+    joblib.dump(feature_names, f"{MODELS_DIR}/feature_names.pkl") #saves the exact column order the model expects
+    joblib.dump(best_name, f"{MODELS_DIR}/model_name.pkl") #saves the model's name so the app can display it
+
+    print(f"Saved model artifacts to '{MODELS_DIR}/'")
+    return best_name, best_model

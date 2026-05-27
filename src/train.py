@@ -24,14 +24,14 @@ PLOTS_DIR = "plots"
 os.makedirs(MODELS_DIR, exist_ok=True)
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
-def get_models():
+def get_models(): #defines 3 ML models with their settings"
     return {
         "Logistic Regression": LogisticRegression(max_iter=1000, solver='lbfgs', random_state=42),
         "Random Forest": RandomForestClassifier(n_estimators=200, max_depth=10, random_state=42),
         "XGBoost": XGBClassifier(n_estimators=200, max_depth=10, learning_rate=0.1, eval_metric='logloss', verbosity=0, random_state=42)
     }
 
-def train_and_evaluate(X_train, X_test, y_train, y_test):
+def train_and_evaluate(X_train, X_test, y_train, y_test): #trains and evaluates models
     models = get_models()
     results = {}
     for name, model in models.items():
@@ -54,7 +54,7 @@ def train_and_evaluate(X_train, X_test, y_train, y_test):
         print(f"{name}: Accuracy={results[name]['metrics']['Accuracy']:.3f}, F1={results[name]['metrics']['F1-Score']:.3f}, AUC={results[name]['metrics']['ROC-AUC']:.3f}")
     return results
 
-def plot_confusion_matrices(results, y_test):
+def plot_confusion_matrices(results, y_test): #generates and saves confusion matrix plots
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
     fig.suptitle("Confusion Matrices", fontsize = 16, fontweight="bold")
     for ax, (name, data) in zip(axes, results.items()):
@@ -68,7 +68,7 @@ def plot_confusion_matrices(results, y_test):
     plt.close()
     print("Saved: confusion_matrices.png")
 
-def plot_roc_curves(results, y_test):
+def plot_roc_curves(results, y_test): #generates and saves ROC curve plots
     plt.figure(figsize=(8, 6))
     colors = ['#3498db', '#e74c3c', '#2ecc71']
     for (name, data), color in zip(results.items(), colors):
@@ -88,7 +88,7 @@ def plot_roc_curves(results, y_test):
     plt.close()
     print("Saved: roc_curves.png")
 
-def plot_feature_importance(results, feature_names):
+def plot_feature_importance(results, feature_names): #generates and saves feature importance plots
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))
     fig.suptitle("Feature Importance", fontsize=16, fontweight='bold')
     for ax, model_name in zip(axes, ["Random Forest", "XGBoost"]):
@@ -104,7 +104,7 @@ def plot_feature_importance(results, feature_names):
     plt.close()
     print("Saved: feature_importance.png")
 
-def select_and_save_best_model(results, imputer,scaler, feature_names):
+def select_and_save_best_model(results, imputer,scaler, feature_names): #selects the best model and saves it
     best_name = max(results, key=lambda k: results[k]['metrics']['F1-Score'])
     best_model = results[best_name]["model"]
     print(f"\nBest Model: {best_name} (F1={results[best_name]['metrics']['F1-Score']:.4f})")
@@ -116,3 +116,16 @@ def select_and_save_best_model(results, imputer,scaler, feature_names):
 
     print(f"Saved model artifacts to '{MODELS_DIR}/'")
     return best_name, best_model
+
+def main():
+    print("Loan Approval Model - Training Pipeline")
+    X_train, X_test, y_train, y_test, imputer, scaler, feature_names = preprocess_for_training(DATA_PATH) #trains and evaluates all 3 models and return metrics
+    results = train_and_evaluate(X_train, X_test, y_train, y_test)
+    plot_confusion_matrices(results, y_test)
+    plot_roc_curves(results, y_test)
+    plot_feature_importance(results, feature_names)
+    select_and_save_best_model(results, imputer, scaler, feature_names)
+    print("\nTraining complete! Run: streamlit run app.py")
+
+if __name__ == "__main__": #this means: "only run main() if this file is being run directly (not imported by another file)
+    main()

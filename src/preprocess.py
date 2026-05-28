@@ -25,7 +25,8 @@ def encode_features(df):
     df['Married'] = df['Married'].map({'Yes': 1, 'No': 0})
     df['Education'] = df['Education'].map({'Graduate': 1, 'Not Graduate': 0})
     df['Self_Employed'] = df['Self_Employed'].map({'Yes': 1, 'No': 0})
-    df['Loan_Status'] = df['Loan_Status'].map({'Y': 1, 'N': 0})
+    if 'Loan_Status' in df.columns:
+        df['Loan_Status'] = df['Loan_Status'].map({'Y': 1, 'N': 0})
     df['Property_Urban'] = (df['Property_Area'] == 'Urban').astype(int)
     df['Property_Semiurban'] = (df['Property_Area'] == 'Semiurban').astype(int)
     df['Property_Rural'] = (df['Property_Area'] == 'Rural').astype(int)

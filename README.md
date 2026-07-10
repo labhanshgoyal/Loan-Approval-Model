@@ -2,7 +2,7 @@
 
 > A machine learning web application that predicts whether a loan application should be approved or rejected — built with Python, scikit-learn, XGBoost, and Streamlit.
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit-FF4B4B?style=for-the-badge)](https://your-app-link-here.streamlit.app)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit-FF4B4B?style=for-the-badge)](https://loan-approval-model-labhanshgoyal.streamlit.app/)
 [![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.20+-FF4B4B?style=for-the-badge&logo=streamlit)](https://streamlit.io)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.0+-F7931E?style=for-the-badge&logo=scikitlearn)](https://scikit-learn.org)
@@ -11,7 +11,7 @@
 
 ## 🌐 Live Demo
 
-**[👉 Try it here](https://your-app-link-here.streamlit.app)**
+**[👉 Try it here](https://loan-approval-model-labhanshgoyal.streamlit.app/)**
 
 Fill in an applicant's personal, income, and loan details — get an instant approval prediction with confidence score and risk level.
 

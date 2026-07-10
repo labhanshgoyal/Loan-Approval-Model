@@ -1,344 +1,157 @@
-## Overview
- 
-This project implements an end-to-end **supervised binary classification** pipeline to determine whether a loan application should be **approved** or **rejected**. It covers the full data science lifecycle — from raw data ingestion and exploratory analysis, through preprocessing and feature engineering, to training multiple ML models and comparing their performance.
- 
-The goal is to help financial institutions automate and improve their loan screening process using data-driven insights.
- 
+# 🏦 Loan Approval Predictor
+
+> A machine learning web application that predicts whether a loan application should be approved or rejected — built with Python, scikit-learn, XGBoost, and Streamlit.
+
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit-FF4B4B?style=for-the-badge)](https://your-app-link-here.streamlit.app)
+[![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.20+-FF4B4B?style=for-the-badge&logo=streamlit)](https://streamlit.io)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.0+-F7931E?style=for-the-badge&logo=scikitlearn)](https://scikit-learn.org)
+
 ---
 
-## 📑 Table of Contents
- 
-- [Problem Statement](#problem-statement)
-- [Project Structure](#project-structure)
-- [Dataset](#dataset)
-- [Data Schema](#data-schema)
-- [ML Pipeline / Workflow](#ml-pipeline--workflow)
-- [Models Used](#models-used)
-- [Evaluation Metrics](#evaluation-metrics)
-- [Results Summary](#results-summary)
-- [Feature Importance](#feature-importance)
-- [Technologies Used](#technologies-used)
-- [Quick Start](#quick-start)
-- [Business Applications](#business-applications)
-- [Future Work](#future-work)
-- [Contributing](#contributing)
+## 🌐 Live Demo
+
+**[👉 Try it here](https://your-app-link-here.streamlit.app)**
+
+Fill in an applicant's personal, income, and loan details — get an instant approval prediction with confidence score and risk level.
+
 ---
- 
-## Problem Statement
- 
-> **Given an applicant's personal, financial, and credit-related attributes, predict whether their loan application will be approved (`1`) or rejected (`0`).**
- 
-Manual loan evaluation is slow, inconsistent, and prone to human bias. A predictive model enables:
-- Consistent and explainable decision-making
-- Faster processing times
-- Better risk management
+
+## 📌 Project Overview
+
+This project transforms a raw loan dataset (500 applicants) into a **production-ready ML pipeline** with a deployed web application. It solves three core problems from the original exploratory notebook:
+
+| Problem | Original Notebook | This Project |
+|---|---|---|
+| Missing data | `dropna()` — deleted 110 rows (22%) | `SimpleImputer` — keeps all 500 rows |
+| Models trained | Logistic Regression only | Logistic Regression + Random Forest + XGBoost |
+| Deployment | Not deployable | Live Streamlit web app |
+
 ---
- 
-## Project Structure
- 
+
+## 🎯 Model Results
+
+Three models were trained and evaluated on an 80/20 train-test split:
+
+| Model | Accuracy | F1-Score | ROC-AUC |
+|---|---|---|---|
+| **Logistic Regression** ⭐ | **83.0%** | **88.6%** | **83.1%** |
+| Random Forest | 81.0% | 86.9% | 79.7% |
+| XGBoost | 76.0% | 82.6% | 78.8% |
+
+> **Winner: Logistic Regression** — On small, structured datasets (~500 rows), a well-tuned linear model outperforms complex ensemble methods that tend to overfit.
+
+---
+
+## 🗂️ Project Structure
+
 ```
 Loan-Approval-Model/
 │
-├── Copy_of_Loan_Approval_Prediction.ipynb   # Main Jupyter Notebook (full pipeline)
-├── df1_loan.xlsx                            # Dataset (Excel format)
-└── README.md                                # Project documentation
-```
- 
----
- 
-## Dataset
- 
-| Property | Details |
-|---|---|
-| **File** | `df1_loan.xlsx` |
-| **Format** | Excel (.xlsx) |
-| **Task Type** | Binary Classification |
-| **Target Variable** | `Loan_Status` (Approved = 1 / Rejected = 0) |
- 
-The dataset contains applicant financial and demographic attributes commonly used in loan underwriting decisions.
- 
----
- 
-## Data Schema
- 
-Below is the feature schema used in the model:
- 
-```
-df1_loan.xlsx
+├── app.py                          # Streamlit web application
+├── df1_loan.xlsx                   # Raw dataset (500 applicants)
+├── requirements.txt                # Python dependencies
 │
-├── Applicant Information
-│   ├── Gender                  → Categorical  (Male / Female)
-│   ├── Married                 → Categorical  (Yes / No)
-│   ├── Dependents              → Ordinal      (0, 1, 2, 3+)
-│   ├── Education               → Categorical  (Graduate / Not Graduate)
-│   └── Self_Employed           → Categorical  (Yes / No)
+├── src/
+│   ├── preprocess.py               # Data cleaning & feature engineering pipeline
+│   ├── train.py                    # Model training, evaluation & visualization
+│   └── predict.py                  # Prediction pipeline for new applicants
 │
-├── Financial Information
-│   ├── ApplicantIncome         → Numeric      (Monthly income of applicant)
-│   ├── CoapplicantIncome       → Numeric      (Monthly income of co-applicant)
-│   ├── LoanAmount              → Numeric      (Loan amount requested, in thousands)
-│   └── Loan_Amount_Term        → Numeric      (Term of loan in months)
+├── models/
+│   ├── best_model.pkl              # Saved best model (Logistic Regression)
+│   ├── imputer.pkl                 # Fitted SimpleImputer (median values)
+│   ├── scaler.pkl                  # Fitted StandardScaler
+│   ├── feature_names.pkl           # Column order used during training
+│   └── model_name.pkl              # Name of the best model
 │
-├── Credit & Property
-│   ├── Credit_History          → Binary       (1 = Good credit, 0 = Bad credit)
-│   └── Property_Area           → Categorical  (Urban / Semiurban / Rural)
-│
-└── Target
-    └── Loan_Status             → Binary       (1 = Approved, 0 = Rejected)
+└── Copy_of_Loan_Approval_Prediction.ipynb  # Original exploratory notebook
 ```
- 
-### Data Types Summary
- 
-| Feature | Type | Description |
-|---|---|---|
-| `Gender` | Categorical | Male / Female |
-| `Married` | Categorical | Marital status |
-| `Dependents` | Ordinal | Number of dependents |
-| `Education` | Categorical | Graduation status |
-| `Self_Employed` | Categorical | Employment type |
-| `ApplicantIncome` | Continuous | Primary applicant income |
-| `CoapplicantIncome` | Continuous | Co-applicant income |
-| `LoanAmount` | Continuous | Requested loan amount (thousands) |
-| `Loan_Amount_Term` | Continuous | Loan repayment period (months) |
-| `Credit_History` | Binary | Credit repayment history flag |
-| `Property_Area` | Categorical | Location of property |
-| `Loan_Status` | Binary (Target) | Approval outcome |
- 
+
 ---
- 
-## ML Pipeline / Workflow
- 
+
+## ⚙️ ML Pipeline
+
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        RAW DATA INGESTION                        │
-│                     (df1_loan.xlsx loaded)                       │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  EXPLORATORY DATA ANALYSIS (EDA)                 │
-│   • Distribution plots       • Correlation heatmap              │
-│   • Class balance check       • Outlier detection               │
-│   • Feature-target relationships                                 │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       DATA PREPROCESSING                         │
-│   • Handle missing values (imputation)                          │
-│   • Encode categorical features (Label / One-Hot Encoding)      │
-│   • Feature scaling (StandardScaler / MinMaxScaler)             │
-│   • Train/Test split (80% / 20%)                                │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        MODEL TRAINING                            │
-│                                                                  │
-│   ┌──────────────────┐  ┌─────────────────┐  ┌──────────────┐  │
-│   │ Logistic         │  │ Random          │  │   XGBoost    │  │
-│   │ Regression       │  │ Forest          │  │  Classifier  │  │
-│   └──────────────────┘  └─────────────────┘  └──────────────┘  │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       MODEL EVALUATION                           │
-│   • Accuracy Score           • Confusion Matrix                 │
-│   • Precision / Recall       • F1-Score                         │
-│   • ROC-AUC Curve            • Feature Importance Plot          │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    INSIGHTS & CONCLUSIONS                        │
-│   • Best model selection     • Key feature drivers              │
-│   • Business recommendations • Deployment considerations         │
-└─────────────────────────────────────────────────────────────────┘
+Raw Excel Data (500 rows)
+        │
+        ▼
+  preprocess.py
+  ├── load_data()          → Load & drop irrelevant columns
+  ├── clean_data()         → Fix '3+' dependents, remove Total_Income
+  ├── encode_features()    → Label encode binary cols, one-hot Property_Area
+  ├── impute_missing()     → Fill NaN with column medians (saves 110 rows!)
+  ├── train_test_split()   → 80% train / 20% test (stratified)
+  └── scale_features()     → StandardScaler on continuous columns
+        │
+        ▼
+  train.py
+  ├── Train 3 models
+  ├── Evaluate (Accuracy, Precision, Recall, F1, ROC-AUC)
+  ├── Generate plots (Confusion Matrix, ROC Curves, Feature Importance)
+  └── Save best model + artifacts to models/
+        │
+        ▼
+  predict.py / app.py
+  └── Load artifacts → Transform input → Predict → Return result
 ```
- 
+
 ---
- 
-## Models Used
- 
-| # | Model | Type | Key Hyperparameters |
-|---|---|---|---|
-| 1 | **Logistic Regression** | Linear Classifier | `max_iter=1000`, `solver='lbfgs'` |
-| 2 | **Random Forest** | Ensemble (Bagging) | `n_estimators=100`, `max_depth=None` |
-| 3 | **XGBoost** | Ensemble (Boosting) | `learning_rate=0.1`, `n_estimators=100` |
- 
----
- 
-## Evaluation Metrics
- 
-All models were evaluated on the held-out test set using the following metrics:
- 
-| Metric | Description |
-|---|---|
-| **Accuracy** | Percentage of correctly classified instances |
-| **Precision** | Of all predicted approvals, how many were actually approved |
-| **Recall (Sensitivity)** | Of all actual approvals, how many were correctly predicted |
-| **F1-Score** | Harmonic mean of Precision and Recall |
-| **ROC-AUC Score** | Model's ability to distinguish between classes (0 to 1) |
-| **Confusion Matrix** | TP / FP / TN / FN breakdown |
- 
-### Confusion Matrix Layout
- 
-```
-                  Predicted: No      Predicted: Yes
-Actual: No     [ True Negative  |  False Positive ]
-Actual: Yes    [ False Negative |  True Positive  ]
-```
- 
----
- 
-## Results Summary
- 
-> *Results are based on the trained models in the notebook. Refer to the Colab notebook for exact figures.*
- 
-| Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC |
-|---|---|---|---|---|---|
-| Logistic Regression | ~80% | ~0.82 | ~0.90 | ~0.86 | ~0.83 |
-| Random Forest | ~82% | ~0.84 | ~0.91 | ~0.87 | ~0.86 |
-| **XGBoost** | **~84%** | **~0.85** | **~0.92** | **~0.88** | **~0.88** |
- 
-> ✅ **XGBoost** achieved the best overall performance based on F1-Score and ROC-AUC.
- 
----
- 
-## Feature Importance
- 
-Based on the Random Forest and XGBoost analyses, the top features driving loan approval decisions are:
- 
-```
-Feature Importance (Approximate Ranking)
-─────────────────────────────────────────
-1. Credit_History          ████████████████████  (Highest Impact)
-2. ApplicantIncome         ██████████████
-3. LoanAmount              ████████████
-4. CoapplicantIncome       ██████████
-5. Loan_Amount_Term        ████████
-6. Property_Area           ██████
-7. Education               █████
-8. Dependents              ████
-9. Married                 ███
-10. Self_Employed           ██
-11. Gender                  █                   (Lowest Impact)
-```
- 
-> 💡 `Credit_History` is by far the most influential predictor. Applicants with a good credit history (value = 1) are significantly more likely to get approved.
- 
----
- 
-## Technologies Used
- 
-| Library | Version | Purpose |
-|---|---|---|
-| `Python` | 3.8+ | Core programming language |
-| `Pandas` | ≥1.3 | Data manipulation and analysis |
-| `NumPy` | ≥1.21 | Numerical computations |
-| `Scikit-learn` | ≥0.24 | ML models, preprocessing, metrics |
-| `XGBoost` | ≥1.4 | Gradient boosting classifier |
-| `Matplotlib` | ≥3.4 | Static visualizations |
-| `Seaborn` | ≥0.11 | Statistical visualizations |
-| `Google Colab` | — | Cloud-based notebook execution |
-| `OpenPyXL` | ≥3.0 | Reading `.xlsx` dataset files |
- 
----
- 
-## Quick Start
- 
-### Option 1 — Google Colab (Recommended)
- 
-Click the badge below to run the notebook instantly in your browser — no setup required:
- 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Whdei9ZZDdIyIxPAzNgOrLXHYOkIemy1)
- 
-### Option 2 — Run Locally
- 
-**Prerequisites:** Python 3.8+, pip
- 
+
+## 🚀 Run Locally
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/labhanshgoyal/Loan-Approval-Model.git
 cd Loan-Approval-Model
- 
-# 2. Install dependencies
-pip install pandas numpy scikit-learn xgboost matplotlib seaborn openpyxl jupyter
- 
-# 3. Launch Jupyter Notebook
-jupyter notebook Copy_of_Loan_Approval_Prediction.ipynb
+
+# 2. Create and activate conda environment
+conda create -n loan-approval python=3.10
+conda activate loan-approval
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. (Optional) Retrain the model
+python src/train.py
+
+# 5. Run the web app
+streamlit run app.py
 ```
- 
-### Notebook Execution Order
- 
-Run cells sequentially in this order:
- 
-```
-Step 1 → Import libraries
-Step 2 → Load dataset (df1_loan.xlsx)
-Step 3 → EDA — distributions, correlation heatmap, class balance
-Step 4 → Data preprocessing — imputation, encoding, scaling
-Step 5 → Train/Test split
-Step 6 → Train Logistic Regression
-Step 7 → Train Random Forest
-Step 8 → Train XGBoost
-Step 9 → Compare evaluation metrics
-Step 10 → Feature importance analysis
-Step 11 → Conclusions and insights
-```
- 
+
 ---
- 
-## Business Applications
- 
-This model can directly support financial institutions in the following ways:
- 
-| Use Case | Benefit |
+
+## 🛠️ Tech Stack
+
+| Category | Technology |
 |---|---|
-| **Automated Loan Screening** | Reduce manual review time from days to seconds |
-| **Risk Assessment** | Identify high-risk applications before approval |
-| **Consistency** | Apply uniform criteria across all applications |
-| **Bias Reduction** | Move away from subjective human judgments |
-| **Portfolio Management** | Predict default likelihood at scale |
-| **Regulatory Compliance** | Maintain explainable, auditable decision logs |
- 
+| Language | Python 3.10 |
+| ML Models | Logistic Regression, Random Forest, XGBoost |
+| ML Library | scikit-learn, XGBoost |
+| Data | pandas, NumPy |
+| Visualization | Matplotlib, Seaborn |
+| Web App | Streamlit |
+| Model Persistence | joblib |
+| Data Source | Excel (openpyxl) |
+
 ---
- 
-## Future Work
- 
-- [ ] **Hyperparameter Tuning** — Apply GridSearchCV / RandomizedSearchCV for optimal parameters
-- [ ] **Cross-Validation** — Implement k-fold CV for more robust evaluation
-- [ ] **Class Imbalance Handling** — Use SMOTE or class weighting if target is skewed
-- [ ] **SHAP Explainability** — Add SHAP value plots for interpretable predictions
-- [ ] **Model Deployment** — Wrap model in a Flask/FastAPI REST API
-- [ ] **Streamlit App** — Build an interactive web UI for real-time predictions
-- [ ] **Pipeline Automation** — Create an sklearn `Pipeline` object for end-to-end inference
-- [ ] **Additional Models** — Explore LightGBM, CatBoost, and SVM
+
+## 📊 Features
+
+- ✅ **3 ML models** trained and compared automatically
+- ✅ **Imputation over deletion** — retains all training data
+- ✅ **Full evaluation suite** — Accuracy, Precision, Recall, F1, ROC-AUC
+- ✅ **Visualizations** — Confusion matrices, ROC curves, Feature importance charts
+- ✅ **Risk scoring** — Low / Medium / High risk labels
+- ✅ **Auto-training** — Model trains automatically if artifacts not found
+- ✅ **Deployed** — Live web app accessible from any device
+
 ---
- 
-## Contributing
- 
-Contributions are welcome! Here's how to get started:
- 
-```bash
-# 1. Fork the repository
-# 2. Create your feature branch
-git checkout -b feature/your-feature-name
- 
-# 3. Commit your changes
-git commit -m "Add: your feature description"
- 
-# 4. Push to your branch
-git push origin feature/your-feature-name
- 
-# 5. Open a Pull Request
-```
- 
-Please ensure your contributions include clear comments and follow existing code style.
- 
----
- 
-## Author
- 
+
+## 👤 Author
+
 **Labhansh Goyal**
+- GitHub: [@labhanshgoyal](https://github.com/labhanshgoyal)
+
+---
+
+*Built as part of a machine learning portfolio project — transforming an exploratory notebook into a fully deployed, production-ready application.*
